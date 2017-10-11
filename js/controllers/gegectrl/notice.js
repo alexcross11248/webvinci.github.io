@@ -1,11 +1,30 @@
 'use strict';
 
-/* Controllers */
-
 app
-	// Flot Chart controller
-	.controller('NoticeCtrl', ['$scope', 'commonService', 'modelService', function($scope, commonService, modelService) {
+	.controller('NoticeCtrl', ['$scope', 'commonService', 'modelService', '$newLocalStorage', '$state', function($scope, commonService, modelService, $newLocalStorage, $state) {
 		console.log('公告管理');
+		$scope.showContent = false;
+		$scope.gegeUser = JSON.parse($newLocalStorage.get('gege_manager'));
+		if($scope.gegeUser) {
+			//判断是否有权限
+			if($scope.$parent.gegePermisson.noticePermisson) {
+				$scope.showContent = true;
+			} else {
+				alert('您还没有相应权限，联系管理员给您开通吧！');
+				return;
+			}
+		} else {
+			$state.go('access.signin');
+		}
+		//能够选择的科室为此账号下能管理的科室
+		$scope.depList = angular.copy($scope.gegeUser.Admdepartmentlist);
+		if($scope.depList.length > 0) {
+			$scope.depList = _.map($scope.depList, function(item) {
+				item.DepartmentChecked = false;
+				return item;
+			});
+		}
+		//初始化富文本编辑器
 		$(document).ready(function() {
 			$('#summernote').summernote({
 				lang: 'zh-CN', // default: 'en-US'
@@ -38,19 +57,14 @@ app
 		$scope.noticeDetail = {};
 		$scope.pageList = [];
 		$scope.initNoticeDetail = {
-			DisplayOrder: 0,
-			DepartmentId: '',
-			HospitalName: '',
-			Name: '',
-			Contact: '',
-			Phone: '',
-			OperatorId: ''
+
 		};
 		//根据分页获取公告列表
 		$scope.getNoticeList = function(page) {
 			modelService.getNoticeList({
 				pageNumber: page,
-				pageSize: $scope.pageSize
+				pageSize: $scope.pageSize,
+				adminId: $scope.gegeUser.AdmId
 			}).then(function(res) {
 				console.log(res);
 				if(res.code == 0) {
@@ -58,12 +72,10 @@ app
 					$scope.noticeList = _.map(commonService.translateServerData(res.body), function(item) {
 						item.NoticeTime = commonService.str2date(item.NoticeTime, 'yyyy-MM-dd');
 						item.OperatorTime = commonService.str2date(item.OperatorTime, 'yyyy-MM-dd');
-						if (item.Type==0) {
-							item.acceptArea='平台';
-						}else if (item.Type==1) {
-							item.acceptArea='全院';
-						}else if (item.Type==2) {
-							item.acceptArea='科室';
+						if(item.Type == 0) {
+							item.acceptArea = '平台';
+						} else if(item.Type == 1) {
+							item.acceptArea = '医院';
 						}
 						return item;
 					});
@@ -127,11 +139,25 @@ app
 		}
 
 		//删除公告
-//		$scope.deleteNotice = function() {
-//			$('#modal_showAudit').modal('show');
-//			$scope.noticeDetail = angular.copy($scope.initNoticeDetail);
-//
-//		}
+		//		$scope.deleteNotice = function() {
+		//			$('#modal_showAudit').modal('show');
+		//			$scope.noticeDetail = angular.copy($scope.initNoticeDetail);
+		//
+		//		}
+
+		//处理选择的科室
+		$scope.dealSelectDep = function() {
+			$scope.noticeDetail.departmentlist = [];
+			//处理选择的科室
+			for(var i = 0; i < $scope.depList.length; i++) {
+				if($scope.depList[i].DepartmentChecked) {
+					var obj = {
+						DepartmentId: $scope.depList[i].DepartmentId
+					};
+					$scope.noticeDetail.departmentlist.push(obj);
+				}
+			}
+		}
 
 		//显示公告
 		$scope.editNotice = function() {
@@ -148,62 +174,112 @@ app
 		}
 		//更新公告信息
 		$scope.subNotice = function(item) {
+			$scope.noticeDetail.OperatorId=$scope.gegeUser.AdmId;
+			if($scope.gegeUser.Role == 0 || $scope.gegeUser.Role == 1) {
+				//系统管理员发布的公告类型为平台
+				$scope.noticeDetail.Type = 0;
+			} else {
+				//院内管理员发布的公告类型为医院
+				$scope.noticeDetail.Type = 1;
+			}
 			var content = $('#summernote').summernote('code');
-			$scope.noticeDetail.Content=content;
+			$scope.noticeDetail.Content = content;
+			$scope.noticeDetail.HospitalId = $scope.gegeUser.HospitalId;
+			$scope.noticeDetail.HospitalName = $scope.gegeUser.HospitalName;
+			//处理选择接收公告的科室
+			$scope.dealSelectDep();
 			console.log($scope.noticeDetail);
 			var fd = new FormData();
 			var file = document.querySelector('#fileToUpload').files[0];
 			fd.append('fileToUpload', file);
-
-			if(file == null || file == '' || file == undefined) {
-
-			} else {
-				$.ajax({
-					url: 'http://zh.buzzlysoft.com/ImgHandler.ashx',
-					type: "POST",
-					async: false,
-					cache: false,
-					processData: false,
-					contentType: false,
-					data: fd,
-					success: function(res) {
-						$scope.noticeDetail.Attachment = res;
-						console.log(res);
-					},
-					error: function(err) {
-						console.log(err);
-					}
-				});
-			}
 			if($scope.operateState == 'add') {
 				console.log(JSON.stringify({
 					model: $scope.noticeDetail
 				}));
-				modelService.addNoticeList({
-					model: $scope.noticeDetail
-				}).then(function(result) {
-					if(result.code == 0) {
-						alert('添加成功');
-					} else {
-						alert('添加失败');
-					}
-				}, function(error) {
-					console.log(error);
-				});
+				if(file == null || file == '' || file == undefined) {
+					modelService.addNoticeList({
+						model: $scope.noticeDetail
+					}).then(function(result) {
+						if(result.code == 0) {
+							alert('添加成功');
+						} else {
+							alert('添加失败');
+						}
+					}, function(error) {
+						console.log(error);
+					});
+				} else {
+					$.ajax({
+						url: modelService.rootUrl + 'NoticeHandler.ashx',
+						type: "POST",
+						async: false,
+						cache: false,
+						processData: false,
+						contentType: false,
+						data: fd,
+						success: function(res) {
+							$scope.noticeDetail.Attachment = res;
+							modelService.addNoticeList({
+								model: $scope.noticeDetail
+							}).then(function(result) {
+								if(result.code == 0) {
+									alert('添加成功');
+								} else {
+									alert('添加失败');
+								}
+							}, function(error) {
+								console.log(error);
+								alert('网络故障，请刷新重试!');
+							});
+						},
+						error: function(err) {
+							console.log(err);
+						}
+					});
+				}
 
 			} else if($scope.operateState == 'edit') {
-				modelService.updateNoticeList({
-					model: $scope.noticeDetail
-				}).then(function(result) {
-					if(res.code == 0) {
-						alert('添加成功');
-					} else {
-						alert('添加失败');
-					}
-				}, function(error) {
-					console.log(error);
-				});
-				
+				if(file == null || file == '' || file == undefined) {
+					modelService.updateNoticeList({
+						model: $scope.noticeDetail
+					}).then(function(result) {
+						if(res.code == 0) {
+							alert('添加成功');
+						} else {
+							alert('添加失败');
+						}
+					}, function(error) {
+						console.log(error);
+					});
+				} else {
+					$.ajax({
+						url: modelService.rootUrl + 'NoticeHandler.ashx',
+						type: "POST",
+						async: false,
+						cache: false,
+						processData: false,
+						contentType: false,
+						data: fd,
+						success: function(res) {
+							$scope.noticeDetail.Attachment = res;
+							modelService.updateNoticeList({
+								model: $scope.noticeDetail
+							}).then(function(result) {
+								if(res.code == 0) {
+									alert('添加成功');
+								} else {
+									alert('添加失败');
+								}
+							}, function(error) {
+								console.log(error);
+							});
+						},
+						error: function(err) {
+							console.log(err);
+						}
+					});
+				}
+
 			}
 			$('#modal_showAudit').modal('hide');
 			$scope.noticeDetail = {};

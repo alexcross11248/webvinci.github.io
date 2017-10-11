@@ -4,7 +4,7 @@
 
 app
 	// Flot Chart controller
-	.controller('NurseLiscenceCtrl', ['$scope', 'commonService', 'modelService', function($scope, commonService, modelService) {
+	.controller('NurseLiscenceCtrl', ['$scope', 'commonService', 'modelService', '$newLocalStorage', function($scope, commonService, modelService, $newLocalStorage) {
 		$scope.currentPageNo = 1;
 		$scope.pageSize = 10;
 		$scope.liscenceList = [];
@@ -13,9 +13,18 @@ app
 		$scope.selectData = false; //是否选中一行
 		$scope.searchOption = {}; //搜索条件
 		$scope.searchState = 'all'; //页面初始显示全部
+		$scope.showContent=false;
 		console.log('护士资格证');
+		
+		//判断是否有权限
+		if($scope.$parent.gegePermisson.nurseLiscencePermisson) {
+			$scope.showContent=true;
+		} else {
+			alert('您还没有相应权限，联系管理员给您开通吧！');
+		}
 
 		$scope.getLiscenceList = function(page) {
+			$scope.liscenceList = [];
 			if($scope.searchState == 'all') {
 				var data = {
 					pageNumber: page,
@@ -66,7 +75,6 @@ app
 				}
 			}, function(err) {});
 		}
-
 		$scope.getLiscenceList($scope.currentPageNo);
 
 		$scope.searchByOption = function() {
@@ -81,23 +89,48 @@ app
 
 		//提交审核
 		$scope.updateAuditStatus = function(status) {
-			$scope.liscenceDetail.Type = 1;
+			$scope.liscenceDetail.Type = 2;
 			if(status == 'ok') {
 				//通过审核
 				$scope.liscenceDetail.VerifyStatus = 3;
+				console.log(JSON.stringify({
+					model: $scope.liscenceDetail
+				}));
 				modelService.UpdateAuditStatus({
 					model: $scope.liscenceDetail
 				}).then(function(res) {
 					console.log(res);
+					if(res == 0) {
+						alert('审核通过提交成功');
+						$('#modal_showAudit').modal('hide');
+						$('tbody tr').removeClass('tr-success');
+						$scope.selectData = false;
+						$scope.liscenceDetail = {};
+						$scope.getLiscenceList($scope.currentPageNo);
+					}else{
+						alert('数据提交失败！');
+					}
 				}, function(err) {});
 			}
 			if(status == 'deny') {
 				//拒绝通过
+				if ($scope.liscenceDetail.VerifyView==''||$scope.liscenceDetail.VerifyView==undefined) {
+					alert('请输入拒绝的意见');
+					return;
+				}
 				$scope.liscenceDetail.VerifyStatus = 2;
 				modelService.UpdateAuditStatus({
 					model: $scope.liscenceDetail
 				}).then(function(res) {
 					console.log(res);
+					if(res == 0) {
+						alert('拒绝通过提交成功');
+						$('#modal_showAudit').modal('hide');
+						$('tbody tr').removeClass('tr-success');
+						$scope.selectData = false;
+						$scope.liscenceDetail = {};
+						$scope.getLiscenceList($scope.currentPageNo);
+					}
 				}, function(err) {});
 			}
 		}
@@ -125,7 +158,6 @@ app
 			$scope.getLiscenceList(i);
 		}
 
-		
 		//选中行
 		$scope.operateData = function($index, item) {
 			console.log($index);

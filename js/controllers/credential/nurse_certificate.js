@@ -1,7 +1,7 @@
 'use strict';
 
 app
-	.controller('NurseCertificateCtrl', ['$scope', 'commonService', 'modelService', function($scope, commonService, modelService) {
+	.controller('NurseCertificateCtrl', ['$scope', 'commonService', 'modelService', '$newLocalStorage', '$rootScope', function($scope, commonService, modelService, $newLocalStorage, $rootScope) {
 		$scope.currentPageNo = 1; //第一页
 		$scope.pageSize = 10; //每页10条
 		$scope.certificateList = []; //执业证列表
@@ -10,7 +10,14 @@ app
 		$scope.selectData = false; //是否选中一行
 		$scope.searchOption = {}; //搜索条件
 		$scope.searchState = 'all'; //页面初始显示全部
+		$scope.showContent=false;
 		console.log('护士执业证');
+		$scope.gegeUser = JSON.parse($newLocalStorage.get('gege_manager'));
+		if ($scope.$parent.gegePermisson.nurseCertificatePermisson) {
+			$scope.showContent=true;
+		}else{
+			alert('您还没有相应权限，联系管理员给您开通吧！');
+		}
 
 		$scope.getCertificateList = function(page) {
 			if($scope.searchState == 'all') {
@@ -53,6 +60,7 @@ app
 						}
 						return item;
 					});
+					$scope.pageList=[];
 					//获取数据总条数
 					$scope.totalNum = parseInt(res.msg);
 					//计算页数
@@ -76,6 +84,7 @@ app
 		}
 		$scope.searchAll = function() {
 			$scope.searchState = 'all';
+			$scope.getCertificateList(1);
 		}
 
 		//提交审核
@@ -84,19 +93,40 @@ app
 			if(status == 'ok') {
 				//通过审核
 				$scope.certificateDetail.VerifyStatus = 3;
+				console.log($scope.certificateDetail);
 				modelService.UpdateAuditStatus({
 					model: $scope.certificateDetail
 				}).then(function(res) {
 					console.log(res);
+					if(res == 0) {
+						alert('审核通过提交成功');
+						$('#modal_showAudit').modal('hide');
+						$('tbody tr').removeClass('tr-success');
+						$scope.selectData = false;
+						$scope.certificateDetail = {};
+						$scope.getCertificateList($scope.currentPageNo);
+					}
 				}, function(err) {});
 			}
 			if(status == 'deny') {
 				//拒绝通过
+				if ($scope.certificateDetail.VerifyView==''||$scope.certificateDetail.VerifyView==undefined) {
+					alert('请输入拒绝的意见');
+					return;
+				}
 				$scope.certificateDetail.VerifyStatus = 2;
 				modelService.UpdateAuditStatus({
 					model: $scope.certificateDetail
 				}).then(function(res) {
 					console.log(res);
+					if(res == 0) {
+						alert('拒绝通过提交成功');
+						$('#modal_showAudit').modal('hide');
+						$('tbody tr').removeClass('tr-success');
+						$scope.selectData = false;
+						$scope.certificateDetail = {};
+						$scope.getCertificateList($scope.currentPageNo);
+					}
 				}, function(err) {});
 			}
 		}
@@ -130,7 +160,7 @@ app
 			$('tbody tr').removeClass('tr-success');
 			$('tbody tr:eq(' + $index + ')').addClass('tr-success');
 			$scope.selectData = true;
-			$scope.certificateDetail = item;
+			$scope.certificateDetail = angular.copy(item);
 			console.log($scope.departmentInfoDetail);
 		}
 

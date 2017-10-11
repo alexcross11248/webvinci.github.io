@@ -1,5 +1,5 @@
 'use strict';
- angular.module('$localStorage', []).service('$localStorage', function () {  
+ angular.module('$newLocalStorage', []).service('$newLocalStorage', function () {  
         var localStorage = window.localStorage;
 		return {
 			get: function(key) {

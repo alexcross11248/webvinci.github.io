@@ -30,7 +30,7 @@ angular.module('modelService', ['commonService', 'interfaceConfig']).service('mo
 		//审核状态编辑
 		UpdateAuditStatus: function(data) {
 			var defer = $q.defer();
-			$http(commonService.getHttpRequestConfig('get', data, interfaceConfig.UPDATE_AUDIT_STATUS))
+			$http(commonService.getHttpRequestConfig('post', data, interfaceConfig.UPDATE_AUDIT_STATUS))
 				.success(function(result) {
 					defer.resolve(result);
 				})
@@ -88,7 +88,7 @@ angular.module('modelService', ['commonService', 'interfaceConfig']).service('mo
 			return defer.promise;
 		},
 		//获取所有科室信息列表
-		getAllDepatmentList: function(data) {
+		getAllDepartmentList: function(data) {
 			var defer = $q.defer();
 			$http(commonService.getHttpRequestConfig('get', data, interfaceConfig.GET_ALL_DEPARTMENT))
 				.success(function(result) {
@@ -302,7 +302,105 @@ angular.module('modelService', ['commonService', 'interfaceConfig']).service('mo
 					defer.reject(error);
 				});
 			return defer.promise;
+		},
+		//登录
+		login: function(data) {
+			var defer = $q.defer();
+			$http(commonService.getHttpRequestConfig('post', data, interfaceConfig.SIGNIN))
+				.success(function(result) {
+					defer.resolve(result);
+				})
+				.error(function(error) {
+					defer.reject(error);
+				});
+			return defer.promise;
+		},
+		//获取权限列表
+		getPermissionList: function(data) {
+			var defer = $q.defer();
+			$http(commonService.getHttpRequestConfig('get', data, interfaceConfig.GETPERMISSIONLIST))
+				.success(function(result) {
+					defer.resolve(result);
+				})
+				.error(function(error) {
+					defer.reject(error);
+				});
+			return defer.promise;
+		},
+		//获取管理员权限
+		getAdminPermission: function(data) {
+			var defer = $q.defer();
+			$http(commonService.getHttpRequestConfig('get', data, interfaceConfig.GETADMINPERMISSION))
+				.success(function(result) {
+					defer.resolve(result);
+				})
+				.error(function(error) {
+					defer.reject(error);
+				});
+			return defer.promise;
+		},
+		//重置管理员密码
+		resetAdminPassword: function(data) {
+			var defer = $q.defer();
+			$http(commonService.getHttpRequestConfig('post', data, interfaceConfig.RESET_ADMIN_PASSWORD))
+				.success(function(result) {
+					defer.resolve(result);
+				})
+				.error(function(error) {
+					defer.reject(error);
+				});
+			return defer.promise;
+		},
+		//获取所有用户（护士）
+		getAllNurseInfo: function(data) {
+			var defer = $q.defer();
+			$http(commonService.getHttpRequestConfig('get', data, interfaceConfig.GET_ALL_NURSEINFO))
+				.success(function(result) {
+					defer.resolve(result);
+				})
+				.error(function(error) {
+					defer.reject(error);
+				});
+			return defer.promise;
+		},
+		//添加用户（护士）
+		addNurse: function(data) {
+			var defer = $q.defer();
+			$http(commonService.getHttpRequestConfig('post', data, interfaceConfig.ADDNURSE))
+				.success(function(result) {
+					defer.resolve(result);
+				})
+				.error(function(error) {
+					defer.reject(error);
+				});
+			return defer.promise;
+		},
+		//修改用户（护士）
+		updateNurse: function(data) {
+			var defer = $q.defer();
+			$http(commonService.getHttpRequestConfig('post', data, interfaceConfig.UPDATE_NURSE_INFO))
+				.success(function(result) {
+					defer.resolve(result);
+				})
+				.error(function(error) {
+					defer.reject(error);
+				});
+			return defer.promise;
+		},
+		//删除用户（护士）
+		deleteNurse: function(data) {
+			var defer = $q.defer();
+			$http(commonService.getHttpRequestConfig('post', data, interfaceConfig.DELETENURSE))
+				.success(function(result) {
+					defer.resolve(result);
+				})
+				.error(function(error) {
+					defer.reject(error);
+				});
+			return defer.promise;
 		}
+
+
 
 
 	};

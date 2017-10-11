@@ -1,18 +1,30 @@
 'use strict';
 
-/* Controllers */
-
 app
 	// Flot Chart controller
-	.controller('DepartmentInfoCtrl', ['$scope', 'commonService', 'modelService', function($scope, commonService, modelService) {
+	.controller('DepartmentInfoCtrl', ['$scope', 'commonService', 'modelService', '$newLocalStorage', '$state', function($scope, commonService, modelService, $newLocalStorage, $state) {
 		console.log('科室信息管理');
+		$scope.showContent = false;
+		$scope.gegeUser = JSON.parse($newLocalStorage.get('gege_manager'));
+		if($scope.gegeUser) {
+			//判断是否有权限
+			if($scope.$parent.gegePermisson.departmentPermisson) {
+				$scope.showContent = true;
+			} else {
+				alert('您还没有相应权限，联系管理员给您开通吧！');
+				return;
+			}
+		} else {
+			$state.go('access.signin');
+		}
+
 		$scope.hospitalList = []; //医院选择列表
 		$scope.currentPageNo = 1; //第一页
 		$scope.pageSize = 16; //设置每页16条
 		$scope.pageList = []; //分页
 		$scope.showSelectHospital = true; //选中数据显示编辑
 		$scope.UpDepartmentState = false; //上级科室编辑状态
-		$scope.searchOption=''; //搜索条件
+		$scope.searchOption = ''; //搜索条件
 		$scope.initDepatmentInfo = {
 			DisplayOrder: 0,
 			DepartmentId: '',
@@ -22,7 +34,6 @@ app
 			Phone: '',
 			OperatorId: ''
 		};
-		//获取医院列表
 		modelService.getHospitalList().then(function(res) {
 			console.log(res);
 			if(res.code == 0) {
@@ -68,10 +79,11 @@ app
 		}
 
 		//根据分页获取科室列表
-		$scope.getAllDepatmentList = function(page) {
-			modelService.getAllDepatmentList({
+		$scope.getAllDepartmentList = function(page) {
+			modelService.getAllDepartmentList({
 				pageNumber: page,
-				pageSize: $scope.pageSize
+				pageSize: $scope.pageSize,
+				adminId: $scope.gegeUser.AdmId
 			}).then(function(res) {
 				console.log(res);
 				if(res.code == 0) {
@@ -95,7 +107,7 @@ app
 				}
 			}, function(err) {});
 		}
-		$scope.getAllDepatmentList($scope.currentPageNo);
+		$scope.getAllDepartmentList($scope.currentPageNo);
 
 		//后一页
 		$scope.goNext = function(i) {
@@ -103,7 +115,7 @@ app
 				return;
 			} else {
 				i++;
-				$scope.getAllDepatmentList(i);
+				$scope.getAllDepartmentList(i);
 			}
 
 		}
@@ -113,12 +125,12 @@ app
 				return;
 			} else {
 				i--;
-				$scope.getAllDepatmentList(i);
+				$scope.getAllDepartmentList(i);
 			}
 		}
 		//指定页
 		$scope.goCurrentPage = function(i) {
-			$scope.getAllDepatmentList(i);
+			$scope.getAllDepartmentList(i);
 		}
 		//选中行
 		$scope.operateData = function($index, item) {
@@ -144,21 +156,22 @@ app
 		//删除科室
 		$scope.deleteDepartmentInfo = function() {
 			if($scope.selectData) {
-				var data = {
-					DepartmentId: $scope.departmentInfoDetail.DepartmentId
-				};
-				modelService.deleteDepatmentInfo(data).then(function(res) {
-					if(res.code == 0) {
-						alert('删除成功');
-						$scope.getAllDepatmentList($scope.currentPageNo);
-					} else {
-						alert('删除失败');
-					}
-				}, function(err) {
-					alert('网络出错，请刷新重试！');
-				});
+				if(confirm("确定要删除此科室么？")) {
+					var data = {
+						DepartmentId: $scope.departmentInfoDetail.DepartmentId
+					};
+					modelService.deleteDepatmentInfo(data).then(function(res) {
+						if(res.code == 0) {
+							alert('删除成功');
+							$scope.getAllDepartmentList($scope.currentPageNo);
+						} else {
+							alert('删除失败');
+						}
+					}, function(err) {
+						alert('网络出错，请刷新重试！');
+					});
+				}
 			}
-			$('#modal_showAudit').modal('show');
 			$scope.departmentInfoDetail = angular.copy($scope.initDepatmentInfo);
 
 		}
@@ -184,12 +197,14 @@ app
 		}
 
 		//更新科室信息
-		$scope.subDepartmentInfo = function(item) {
+		$scope.subDepartmentInfo = function() {
 			if($scope.operateState == 'add') {
 				var data = JSON.stringify({
 					model: $scope.departmentInfoDetail
 				});
+				console.log(data);
 				modelService.addDepatmentInfo(data).then(function(res) {
+					console.log(res);
 					if(res.code == 0) {
 						alert('添加成功');
 					} else {

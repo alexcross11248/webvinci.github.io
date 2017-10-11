@@ -31,20 +31,22 @@
 						<th>微博</th>
 						<th>护理不良事件</th>
 						<th>学分</th>
+						<th>排班</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr ng-repeat="item in nurseList track by $index" ng-click="operateData($index,item)">
-						<td>{{item.DisplayOrderName}}</td>
-						<td>{{item.DepartmentId}}</td>
-						<td>{{item.HospitalName}}</td>
-						<td>{{item.Name}}</td>
-						<td></td>
-						<td>{{item.Contact}}</td>
-						<td>{{item.Phone}}</td>
-						<td></td>
-						<td></td>
-						<td></td>
+						<td>{{item.id}}</td>
+						<td>{{item.cellphone}}</td>
+						<td>{{item.name}}</td>
+						<td>{{item.departmentName}}</td>
+						<td>{{iten.positions}}</td>
+						<td>{{item.bindInfo.QQNickName}}</td>
+						<td>{{item.bindInfo.WeixinNickName}}</td>
+						<td>{{item.bindInfo.WeiboNickName}}</td>
+						<td>{{item.bindInfo.BLSJId}}</td>
+						<td>{{item.bindInfo.XFId}}</td>
+						<td>{{item.bindInfo.PBId}}</td>
 						<!--<td>
 								<a href class="active" ui-toggle-class><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
 							</td>-->
@@ -84,7 +86,7 @@
 											<div class="form-group">
 												<label class="col-sm-4 control-label text-right">ID：</label>
 												<div class="col-sm-8">
-													{{nurseInfo.ID}}
+													{{nurseInfo.id}}
 												</div>
 											</div>
 										</div>
@@ -94,7 +96,7 @@
 											<div class="form-group">
 												<label class="col-sm-4 control-label text-right">护理不良事件：</label>
 												<div class="col-sm-4">
-													{{nurseInfo.ID}}
+													{{nurseInfo.bindInfo.BLSJId}}
 												</div>
 												<div class="col-sm-4 text-left">
 													<button type="button" class="btn btn-default">解绑</button>
@@ -103,13 +105,14 @@
 										</div>
 									</div>
 								</div>
+
 								<div class="row">
 									<div class="col-sm-6">
 										<div class="row">
 											<div class="form-group">
 												<label class="col-sm-4 control-label text-right">手机：</label>
 												<div class="col-sm-8">
-													<input type="text" class="form-control" placeholder="手机" ng-model="nurseInfo.Phone">
+													<input type="text" class="form-control" placeholder="手机" ng-model="nurseInfo.cellphone">
 												</div>
 											</div>
 										</div>
@@ -120,7 +123,7 @@
 											<div class="form-group">
 												<label class="col-sm-4 control-label text-right">学分：</label>
 												<div class="col-sm-4">
-													{{nurseInfo.ID}}
+													{{nurseInfo.bindInfo.XFId}}
 												</div>
 												<div class="col-sm-4 text-left">
 													<button type="button" class="btn btn-default">解绑</button>
@@ -129,13 +132,14 @@
 										</div>
 									</div>
 								</div>
+
 								<div class="row">
 									<div class="col-sm-6">
 										<div class="row">
 											<div class="form-group">
 												<label class="col-sm-4 control-label text-right">姓名：</label>
 												<div class="col-sm-8">
-													<input type="text" class="form-control" placeholder="姓名" ng-model="nurseInfo.Phone">
+													<input type="text" class="form-control" placeholder="姓名" ng-model="nurseInfo.name">
 												</div>
 											</div>
 										</div>
@@ -146,7 +150,7 @@
 											<div class="form-group">
 												<label class="col-sm-4 control-label text-right">微信：</label>
 												<div class="col-sm-4">
-													{{nurseInfo.ID}}
+													{{nurseInfo.bindInfo.WeixinNickName}}
 												</div>
 												<div class="col-sm-4 text-left">
 													<button type="button" class="btn btn-default">解绑</button>
@@ -155,6 +159,7 @@
 										</div>
 									</div>
 								</div>
+
 								<div class="row">
 									<div class="col-sm-6">
 										<div class="row">
@@ -163,7 +168,7 @@
 												<div class="col-sm-2">
 													<div class="radio">
 														<label class="i-checks">
-                <input type="radio" name="a" value="0" ng-model="nurseInfo.sex">
+                <input type="radio" name="a" value="男" ng-model="nurseInfo.sex">
                 <i></i>
                 	男
               </label>
@@ -172,7 +177,7 @@
 												<div class="col-sm-2">
 													<div class="radio">
 														<label class="i-checks">
-                <input type="radio" name="a" value="1" ng-model="nurseInfo.sex" checked>
+                <input type="radio" name="a" value="女" ng-model="nurseInfo.sex" checked>
                 <i></i>
                 	女
               </label>
@@ -187,7 +192,7 @@
 											<div class="form-group">
 												<label class="col-sm-4 control-label text-right">QQ：</label>
 												<div class="col-sm-4">
-													{{nurseInfo.ID}}
+													{{nurseInfo.bindInfo.QQNickName}}
 												</div>
 												<div class="col-sm-4 text-left">
 													<button type="button" class="btn btn-default">解绑</button>
@@ -196,16 +201,18 @@
 										</div>
 									</div>
 								</div>
+
 								<div class="row">
 									<div class="col-sm-6">
 										<div class="row">
 											<div class="form-group">
-												<label class="col-sm-4 control-label text-right">科室：</label>
+												<label class="col-sm-4 control-label text-right">医院：</label>
 												<div class="col-sm-8">
-													<select class="form-control" ng-model="nurseInfo.Department">
-														<option value="内科">内科</option>
-														<option value="儿科">儿科</option>
-														<option value="神经科">神经科</option>
+													<!--<select class="form-control" ng-model="nurseInfo.HospitalId">
+														<option value="dep.DepartmentId" ng-repeat="hosp in hospList">{{dep.Name}}</option>
+													</select>-->
+													<select class="form-control" ng-model="nurseInfo.hospitalId" ng-change="changeHospital(nurseInfo.hospitalId)" ng-disabled="lockHospital">
+														<option ng-repeat="item in hospitalList" value="{{item.HospitalId}}">{{item.Name}}</option>
 													</select>
 												</div>
 											</div>
@@ -225,13 +232,30 @@
 										</div>
 									</div>
 								</div>
+
+								<div class="row">
+									<div class="col-sm-6">
+										<div class="row">
+											<div class="form-group">
+												<label class="col-sm-4 control-label text-right">科室：</label>
+												<div class="col-sm-8">
+													<select class="form-control" ng-model="nurseInfo.departmentId">
+														<option ng-repeat="dep in depList" value="{{dep.DepartmentId}}">{{dep.Name}}</option>
+													</select>
+												</div>
+											</div>
+
+										</div>
+									</div>
+								</div>
+
 								<div class="row">
 									<div class="col-sm-6">
 										<div class="row">
 											<div class="form-group">
 												<label class="col-sm-4 control-label text-right">职务：</label>
 												<div class="col-sm-8">
-													<input type="text" class="form-control" placeholder="职务" ng-model="hospitalInfoDetail.Contact">
+													<input type="text" class="form-control" placeholder="职务" ng-model="nurseInfo.positions">
 												</div>
 											</div>
 										</div>

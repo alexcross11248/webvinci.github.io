@@ -17,5 +17,5 @@ angular.module('app', [
     'commonService',
     'interfaceConfig',
     'modelService',
-    '$localStorage'
+    '$newLocalStorage'
 ]);

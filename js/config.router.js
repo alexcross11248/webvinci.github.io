@@ -189,6 +189,18 @@ angular.module('app')
 							]
 						}
 					})
+					//修改密码
+					.state('access.changepwd', {
+						url: '/changepwd',
+						templateUrl: 'tpl/gegeView/app_changepwd.html',
+						resolve: {
+							deps: ['uiLoad',
+								function(uiLoad) {
+									return uiLoad.load(['js/controllers/gegectrl/changepwd.js']);
+								}
+							]
+						}
+					})
 					//注册
 					.state('access.signup', {
 						url: '/signup',
@@ -205,6 +217,56 @@ angular.module('app')
 					.state('access.forgotpwd', {
 						url: '/forgotpwd',
 						templateUrl: 'tpl/page_forgotpwd.html'
+					})
+					//404页面
+					.state('access.404', {
+						url: '/404',
+						templateUrl: 'tpl/page_404.html'
+					})
+
+					.state('music', {
+						url: '/music',
+						templateUrl: 'tpl/music.html',
+						controller: 'MusicCtrl',
+						resolve: {
+							deps: ['$ocLazyLoad',
+								function($ocLazyLoad) {
+									return $ocLazyLoad.load([
+										'com.2fdevs.videogular',
+										'com.2fdevs.videogular.plugins.controls',
+										'com.2fdevs.videogular.plugins.overlayplay',
+										'com.2fdevs.videogular.plugins.poster',
+										'com.2fdevs.videogular.plugins.buffering',
+										'js/app/music/ctrl.js',
+										'js/app/music/theme.css'
+									]);
+								}
+							]
+						}
+					})
+					.state('music.home', {
+						url: '/home',
+						templateUrl: 'tpl/music.home.html'
+					})
+					.state('music.genres', {
+						url: '/genres',
+						templateUrl: 'tpl/music.genres.html'
+					})
+					.state('music.detail', {
+						url: '/detail',
+						templateUrl: 'tpl/music.detail.html'
+					})
+					.state('music.mtv', {
+						url: '/mtv',
+						templateUrl: 'tpl/music.mtv.html'
+					})
+					.state('music.mtvdetail', {
+						url: '/mtvdetail',
+						templateUrl: 'tpl/music.mtv.detail.html'
+					})
+					.state('music.playlist', {
+						url: '/playlist/{fold}',
+						templateUrl: 'tpl/music.playlist.html'
 					})
 			}
 		]

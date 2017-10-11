@@ -1,14 +1,28 @@
 'use strict';
 
 app
-	.controller('HospitalInfoCtrl', ['$scope', 'commonService', 'modelService', function($scope, commonService, modelService) {
+	.controller('HospitalInfoCtrl', ['$scope', 'commonService', 'modelService', '$newLocalStorage', '$state', function($scope, commonService, modelService, $newLocalStorage, $state) {
 		$scope.currentPageNo = 1;
 		$scope.pageSize = 16;
 		$scope.hospitalInfoList = [];
 		$scope.pageList = [];
 		$scope.operateState = '';
 		$scope.mapclick = 1;
+		$scope.showContent = false;
 		var map;
+		$scope.gegeUser = JSON.parse($newLocalStorage.get('gege_manager'));
+		if($scope.gegeUser) {
+			//判断是否有权限
+			if($scope.$parent.gegePermisson.hospitalManagePermisson) {
+				$scope.showContent = true;
+			} else {
+				alert('您还没有相应权限，联系管理员给您开通吧！');
+				return;
+			}
+		} else {
+			$state.go('access.signin');
+		}
+
 		$scope.initHospitalInfo = {
 			DisplayOrder: 0,
 			IsOpenBLSJ: 0,
@@ -140,19 +154,21 @@ app
 		$scope.deleteHospitalInfo = function() {
 			console.log('删除');
 			if($scope.selectData) {
-				var data = {
-					HospitalId: $scope.hospitalInfoDetail.HospitalId
-				};
-				modelService.deleteHospitalInfo(data).then(function(res) {
-					if(res.code == 0) {
-						alert('删除成功');
-						$scope.getHospitalInfoList($scope.currentPageNo);
-					} else {
-						alert('删除失败');
-					}
-				}, function(err) {
-					alert('网络出错，请刷新重试！');
-				});
+				if(confirm("确定要删除该医院么？")) {
+					var data = {
+						HospitalId: $scope.hospitalInfoDetail.HospitalId
+					};
+					modelService.deleteHospitalInfo(data).then(function(res) {
+						if(res.code == 0) {
+							alert('删除成功');
+							$scope.getHospitalInfoList($scope.currentPageNo);
+						} else {
+							alert('删除失败');
+						}
+					}, function(err) {
+						alert('网络出错，请刷新重试！');
+					});
+				}
 			} else {
 				alert('请选择要编辑的医院');
 			}
@@ -172,6 +188,7 @@ app
 		}
 		//更新提交医院信息
 		$scope.subHospitalInfo = function(item) {
+			$scope.hospitalInfoDetail.OperatorId=$scope.gegeUser.AdmId;
 			if($scope.operateState == 'add') {
 				console.log($scope.hospitalInfoDetail);
 				var data = JSON.stringify({
@@ -181,6 +198,7 @@ app
 				modelService.addHospitalInfo(data).then(function(res) {
 					if(res.code == 0) {
 						alert('添加成功');
+						$scope.getHospitalInfoList($scope.currentPageNo);
 					} else {
 						alert('添加失败');
 					}
