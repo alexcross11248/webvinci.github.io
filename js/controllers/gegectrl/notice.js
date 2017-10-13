@@ -16,6 +16,12 @@ app
 		} else {
 			$state.go('access.signin');
 		}
+		$scope.currentPageNo = 1;
+		$scope.pageSize = 16;
+		$scope.noticeList = [];
+		$scope.noticeDetail = {};
+		$scope.pageList = [];
+		$scope.initNoticeDetail = {};
 		//能够选择的科室为此账号下能管理的科室
 		$scope.depList = angular.copy($scope.gegeUser.Admdepartmentlist);
 		if($scope.depList.length > 0) {
@@ -51,17 +57,10 @@ app
 			autoclose: 1,
 		});
 
-		$scope.currentPageNo = 1;
-		$scope.pageSize = 16;
-		$scope.noticeList = [];
-		$scope.noticeDetail = {};
-		$scope.pageList = [];
-		$scope.initNoticeDetail = {
-
-		};
 		//根据分页获取公告列表
 		$scope.getNoticeList = function(page) {
 			modelService.getNoticeList({
+				operatorId: $scope.gegeUser.AdmId,
 				pageNumber: page,
 				pageSize: $scope.pageSize,
 				adminId: $scope.gegeUser.AdmId
@@ -73,9 +72,9 @@ app
 						item.NoticeTime = commonService.str2date(item.NoticeTime, 'yyyy-MM-dd');
 						item.OperatorTime = commonService.str2date(item.OperatorTime, 'yyyy-MM-dd');
 						if(item.Type == 0) {
-							item.acceptArea = '平台';
+							item.noticeType = '平台';
 						} else if(item.Type == 1) {
-							item.acceptArea = '医院';
+							item.noticeType = '医院';
 						}
 						return item;
 					});
@@ -133,6 +132,7 @@ app
 			$scope.operateState = 'add';
 			$('tbody tr').removeClass('tr-success');
 			$scope.selectData = false;
+			$('#summernote').summernote('code', '');
 			$('#modal_showAudit').modal('show');
 			$scope.noticeDetail = angular.copy($scope.initNoticeDetail);
 
@@ -174,7 +174,7 @@ app
 		}
 		//更新公告信息
 		$scope.subNotice = function(item) {
-			$scope.noticeDetail.OperatorId=$scope.gegeUser.AdmId;
+			$scope.noticeDetail.operatorId = $scope.gegeUser.AdmId;
 			if($scope.gegeUser.Role == 0 || $scope.gegeUser.Role == 1) {
 				//系统管理员发布的公告类型为平台
 				$scope.noticeDetail.Type = 0;
@@ -248,6 +248,8 @@ app
 						} else {
 							alert('添加失败');
 						}
+						$('#modal_showAudit').modal('hide');
+						$scope.noticeDetail = {};
 					}, function(error) {
 						console.log(error);
 					});
@@ -270,6 +272,8 @@ app
 								} else {
 									alert('添加失败');
 								}
+								$('#modal_showAudit').modal('hide');
+								$scope.noticeDetail = {};
 							}, function(error) {
 								console.log(error);
 							});
@@ -281,13 +285,11 @@ app
 				}
 
 			}
-			$('#modal_showAudit').modal('hide');
-			$scope.noticeDetail = {};
+
 		}
 		//关闭公告框
 		$scope.closeModal = function() {
 			$('#modal_showAudit').modal('hide');
-			$scope.noticeDetail = angular.copy($scope.initSystemNewsDetail);
 		}
 
 		//刷新页面

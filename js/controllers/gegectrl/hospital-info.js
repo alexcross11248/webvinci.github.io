@@ -73,6 +73,7 @@ app
 		//根据分页获取医院列表
 		$scope.getHospitalInfoList = function(page) {
 			modelService.getHospitalInfoList({
+				operatorId: $scope.gegeUser.AdmId,
 				pageNumber: page,
 				pageSize: $scope.pageSize
 			}).then(function(res) {
@@ -156,11 +157,14 @@ app
 			if($scope.selectData) {
 				if(confirm("确定要删除该医院么？")) {
 					var data = {
+						operatorId: $scope.gegeUser.AdmId,
 						HospitalId: $scope.hospitalInfoDetail.HospitalId
 					};
 					modelService.deleteHospitalInfo(data).then(function(res) {
 						if(res.code == 0) {
 							alert('删除成功');
+							$('tbody tr').removeClass('tr-success');
+							$scope.selectData = false;
 							$scope.getHospitalInfoList($scope.currentPageNo);
 						} else {
 							alert('删除失败');
@@ -188,7 +192,7 @@ app
 		}
 		//更新提交医院信息
 		$scope.subHospitalInfo = function(item) {
-			$scope.hospitalInfoDetail.OperatorId=$scope.gegeUser.AdmId;
+			$scope.hospitalInfoDetail.OperatorId = $scope.gegeUser.AdmId;
 			if($scope.operateState == 'add') {
 				console.log($scope.hospitalInfoDetail);
 				var data = JSON.stringify({

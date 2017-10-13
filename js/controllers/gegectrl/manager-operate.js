@@ -39,18 +39,47 @@ app
 			console.log($scope.permissionList);
 		}
 		$scope.getPermissionList();
-		//判断是平台还是院内管理员
-		if($scope.gegeUser.Role == 1) {
-			$scope.disableHospital = false;
+		//获取科室权限
+		$scope.getDepartmentList = function() {
+			$scope.depList = [];
+			for(var i = 0; i < $scope.gegeUser.Admdepartmentlist.length; i++) {
+				var oj = {};
+				oj.Name = $scope.gegeUser.Admdepartmentlist[i].DepartmentName;
+				oj.DepartmentId = $scope.gegeUser.Admdepartmentlist[i].DepartmentId;
+				oj.DepartmentChecked = false;
+				$scope.depList.push(oj);
+			}
+			if($scope.operateState == 'edit') {
+				for(var k = 0; k < $scope.depList.length; k++) {
+					for(var j = 0; j < $scope.managerInfo.Admdepartmentlist.length; j++) {
+						if($scope.managerInfo.Admdepartmentlist[j].DepartmentId == $scope.depList[k].DepartmentId) {
+							$scope.depList[k].DepartmentChecked = true;
+						}
+					}
+				}
+			}
+
+			console.log($scope.depList);
+
 		}
+		//判断是平台还是院内管理员
+//		if($scope.gegeUser.Role == 1) {
+//			$scope.disableHospital = false;
+//		}
 
 		//根据分页获取管理员列表
 		$scope.getManagerInfoList = function(page) {
-			modelService.getAdmin({
+			console.log(JSON.stringify({
+				operatorId: $scope.gegeUser.AdmId,
 				pageNumber: page,
-				pageSize: $scope.pageSize,
-				adminId: $scope.gegeUser.AdmId
+				pageSize: $scope.pageSize
+			}));
+			modelService.getAdmin({
+				operatorId: $scope.gegeUser.AdmId,
+				pageNumber: page,
+				pageSize: $scope.pageSize
 			}).then(function(res) {
+				console.log(res);
 				if(res.code == 0) {
 					//处理返回数据
 					$scope.managerList = _.map(commonService.translateServerData(res.body), function(item) {
@@ -98,11 +127,16 @@ app
 		}
 
 		$scope.operateData = function($index, item) {
-			$('tbody tr').removeClass('tr-success');
-			$('tbody tr:eq(' + $index + ')').addClass('tr-success');
-			$scope.selectData = true;
-			$scope.managerInfo = item;
-			console.log($scope.managerInfo);
+			if(item.AdmId == $scope.gegeUser.AdmId) {
+				return;
+			} else {
+				$('tbody tr').removeClass('tr-success');
+				$('tbody tr:eq(' + $index + ')').addClass('tr-success');
+				$scope.selectData = true;
+				$scope.managerInfo = angular.copy(item);
+				console.log($scope.managerInfo);
+			}
+
 		}
 
 		//获取医院列表
@@ -120,6 +154,7 @@ app
 
 		//根据医院改变科室
 		$scope.changeHospital = function(hospitalId) {
+			$scope.lockDep = false;
 			//调用获取科室服务
 			console.log(hospitalId);
 			modelService.getDepByHospId({
@@ -131,24 +166,13 @@ app
 						item.DepartmentChecked = false;
 						return item;
 					});
-					if($scope.operateState == 'edit') {
-						for(var i = 0; i < $scope.depList.length; i++) {
-							for(var j = 0; j < $scope.managerInfo.Admdepartmentlist.length; j++) {
-								if($scope.managerInfo.Admdepartmentlist[j].DepartmentId == $scope.depList[i].DepartmentId) {
-									$scope.depList[i].DepartmentChecked = true;
-								}
-							}
-						}
-
-					}
-					if($scope.operateState == 'add'&&$scope.gegeUser.Role == 1) {
-						$scope.managerInfo.selectAll = true;
-						$scope.lockDep = true;
-						$scope.selectAll();
-					}
+					$scope.managerInfo.selectAll = true;
+					$scope.lockDep = true;
+					$scope.selectAll();
 				}
 
 			}, function(err) {});
+
 		}
 
 		//全选科室
@@ -166,17 +190,23 @@ app
 		//添加管理员
 		$scope.addManager = function() {
 			$scope.operateState = 'add';
+			$scope.managerInfo = angular.copy($scope.initManagerInfo);
 			$scope.lockInput = false; //打开输入框
 			if($scope.gegeUser.Role == 0 || $scope.gegeUser.Role == 2) {
+				if($scope.gegeUser.Role == 2) {
+					$scope.managerInfo.HospitalId = $scope.gegeUser.HospitalId;
+					$scope.getDepartmentList();
+				} else {
+					$scope.depList = [];
+				}
 				$scope.disableHospital = true; //禁用医院
 			} else if($scope.gegeUser.Role == 1) {
 				$scope.disableHospital = false; //可选医院
 			}
-			$scope.depList = [];
+
 			$('tbody tr').removeClass('tr-success');
 			$scope.selectData = false;
 			$('#modal_showAudit').modal('show');
-			$scope.managerInfo = angular.copy($scope.initManagerInfo);
 			$scope.managerInfo.Admpermissionlist = [];
 			$scope.managerInfo.Admdepartmentlist = [];
 			$scope.getPermissionList();
@@ -187,10 +217,13 @@ app
 			if($scope.selectData) {
 				if(confirm("确定要删除该账号么？")) {
 					modelService.deleteAdmin({
-						AdmId: $scope.managerInfo.AdmId
+						operatorId: $scope.gegeUser.AdmId,
+						AdmId: $scope.managerInfo.AdmId,
 					}).then(function(res) {
 						if(res.code == 0) {
 							alert('删除成功');
+							$('tbody tr').removeClass('tr-success');
+							$scope.selectData = false;
 							$scope.getManagerInfoList($scope.currentPageNo);
 						} else {
 							alert('删除失败');
@@ -207,17 +240,25 @@ app
 
 		//显示编辑框
 		$scope.editManager = function() {
-			$scope.operateState = 'edit';
-			$scope.lockInput = true; //禁用输入框
-			if($scope.gegeUser.Role == 0 || $scope.gegeUser.Role == 2) {
-				$scope.disableHospital = true; //禁用医院
-			} else if($scope.gegeUser.Role == 1) {
-				$scope.disableHospital = false; //可选医院
-			}
 			if($scope.selectData) {
+				$scope.operateState = 'edit';
+				$scope.lockInput = true; //禁用输入框
+				$scope.disableHospital = true; //禁用医院
 				console.log($scope.managerInfo);
 				$('#modal_showAudit').modal('show');
-				$scope.changeHospital($scope.managerInfo.HospitalId);
+				if($scope.gegeUser.Role == 1) {
+					$scope.changeHospital($scope.managerInfo.HospitalId);
+				} else {
+					$scope.getDepartmentList();
+				}
+
+				if($scope.gegeUser.Role == 1) {
+					$scope.lockDep = true;
+				} else if($scope.gegeUser.Role == 2) {
+					$scope.lockDep = false;
+				}
+				console.log($scope.depList);
+				//				$scope.changeHospital($scope.managerInfo.HospitalId);
 				for(var i = 0; i < $scope.permissionList.length; i++) {
 					for(var j = 0; j < $scope.managerInfo.Admpermissionlist.length; j++) {
 						if($scope.permissionList[i].PermissionId == $scope.managerInfo.Admpermissionlist[j].PermissionId) {
@@ -285,6 +326,7 @@ app
 				var data = JSON.stringify({
 					model: $scope.managerInfo
 				});
+				console.log(data);
 				modelService.updateAdmin(data).then(function(res) {
 					if(res.code == 0) {
 						alert('更新成功');

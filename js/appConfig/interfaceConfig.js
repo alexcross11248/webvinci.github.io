@@ -25,7 +25,7 @@ angular.module('interfaceConfig', []).service('interfaceConfig', function() {
 		ADD_BANNER:srv+'AddBanner', //添加banner
 		UPDATE_BANNER:srv+'UpdateBanner', //更新banner
 		DELETE_BANNER:srv+'DeleteBanner', //删除banner
-		GET_BANNER:srv+'GetBanner', //获取banner
+		GET_BANNER:srv+'GetAdminBanner', //获取banner
 		ADD_NOTICE:srv+'AddNotice',//添加公告
 		DELETE_NOTICE:srv+'UpdateDelNotice', //删除公告
 		UPDATE_NOTICE:srv+'UpdateNotice', //更新公告

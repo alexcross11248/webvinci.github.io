@@ -14,8 +14,8 @@
 									<label class="col-sm-2 control-label text-right">banner&nbsp;{{item.DisplayOrder}}</label>
 									<div class="col-sm-10 text-right">
 										<button type="button" class="btn btn-default" ng-click="editOrShow(item)">{{item.btnName}}</button>
-										<button type="button" class="btn btn-default">关闭</button>
-										<button type="button" class="btn btn-default">开启</button>
+										<button type="button" class="btn btn-default" ng-if="!item.btnState" ng-click="bannerShowOrNot(item)">{{item.showState}}</button>
+										<!--<button type="button" class="btn btn-default" ng-if="!item.btnState" ng-click="bannerShowOrNot('open',item)">开启</button>-->
 									</div>
 								</div>
 							</div>
@@ -99,7 +99,7 @@
 							<div class="wrapper-md">
 								<div class="row">
 									<div class="col-sm-12">
-										<img ng-src={{bannerPic.bannerImg}} style="width: 100%;" />
+										<img id="bannerBg" ng-src={{bannerPic.bannerImg}} style="width: 100%;" />
 									</div>
 								</div>
 								<div class="row" style="margin-top: 15px;">

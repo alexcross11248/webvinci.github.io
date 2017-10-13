@@ -10,18 +10,25 @@ app
 		$scope.selectData = false; //是否选中一行
 		$scope.searchOption = {}; //搜索条件
 		$scope.searchState = 'all'; //页面初始显示全部
-		$scope.showContent=false;
+		$scope.showContent = false;
 		console.log('护士执业证');
 		$scope.gegeUser = JSON.parse($newLocalStorage.get('gege_manager'));
-		if ($scope.$parent.gegePermisson.nurseCertificatePermisson) {
-			$scope.showContent=true;
-		}else{
-			alert('您还没有相应权限，联系管理员给您开通吧！');
+		if($scope.gegeUser) {
+			//判断是否有权限
+			if($scope.$parent.gegePermisson.nurseCertificatePermisson) {
+				$scope.showContent = true;
+			} else {
+				alert('您还没有此权限，联系管理员开通吧');
+				return;
+			}
+		} else {
+			$state.go('access.signin');
 		}
 
 		$scope.getCertificateList = function(page) {
 			if($scope.searchState == 'all') {
 				var data = {
+					operatorId: $scope.gegeUser.AdmId,
 					pageNumber: page,
 					pageSize: $scope.pageSize,
 					CertificateId: '',
@@ -29,6 +36,7 @@ app
 				};
 			} else {
 				var data = {
+					operatorId: $scope.gegeUser.AdmId,
 					pageNumber: page,
 					pageSize: $scope.pageSize,
 					CertificateId: $scope.searchOption.certificateID,
@@ -60,7 +68,7 @@ app
 						}
 						return item;
 					});
-					$scope.pageList=[];
+					$scope.pageList = [];
 					//获取数据总条数
 					$scope.totalNum = parseInt(res.msg);
 					//计算页数
@@ -110,7 +118,7 @@ app
 			}
 			if(status == 'deny') {
 				//拒绝通过
-				if ($scope.certificateDetail.VerifyView==''||$scope.certificateDetail.VerifyView==undefined) {
+				if($scope.certificateDetail.VerifyView == '' || $scope.certificateDetail.VerifyView == undefined) {
 					alert('请输入拒绝的意见');
 					return;
 				}

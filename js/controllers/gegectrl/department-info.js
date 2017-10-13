@@ -51,6 +51,7 @@ app
 		$scope.searchByHospital = function(page) {
 			console.log($scope.searchOption.HospitalId);
 			modelService.getDepByHospId({
+				operatorId: $scope.gegeUser.AdmId,
 				HospitalId: $scope.searchOption.HospitalId,
 				pageNumber: page,
 				pageSize: $scope.pageSize
@@ -81,9 +82,9 @@ app
 		//根据分页获取科室列表
 		$scope.getAllDepartmentList = function(page) {
 			modelService.getAllDepartmentList({
+				operatorId: $scope.gegeUser.AdmId,
 				pageNumber: page,
-				pageSize: $scope.pageSize,
-				adminId: $scope.gegeUser.AdmId
+				pageSize: $scope.pageSize
 			}).then(function(res) {
 				console.log(res);
 				if(res.code == 0) {
@@ -158,11 +159,14 @@ app
 			if($scope.selectData) {
 				if(confirm("确定要删除此科室么？")) {
 					var data = {
+						operatorId: $scope.gegeUser.AdmId,
 						DepartmentId: $scope.departmentInfoDetail.DepartmentId
 					};
 					modelService.deleteDepatmentInfo(data).then(function(res) {
 						if(res.code == 0) {
 							alert('删除成功');
+							$('tbody tr').removeClass('tr-success');
+							$scope.selectData = false;
 							$scope.getAllDepartmentList($scope.currentPageNo);
 						} else {
 							alert('删除失败');

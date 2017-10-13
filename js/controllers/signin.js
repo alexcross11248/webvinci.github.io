@@ -11,6 +11,8 @@ app.controller('SigninFormController', ['$scope', '$http', '$state', 'modelServi
 	//判断是否已经登录
 	var gegeManager = JSON.parse($newLocalStorage.get('gege_manager'));
 	if(gegeManager) {
+		$state.go('app.welcome');
+		/*
 		//超级管理员跳转到管理员操作
 		if(gegeManager.Role == 0) {
 			$state.go('app.manager-operate');
@@ -21,6 +23,7 @@ app.controller('SigninFormController', ['$scope', '$http', '$state', 'modelServi
 		} else if(gegeManager.Role == 2) {
 			$state.go('app.nurse-manage');
 		}
+		*/
 	}
 
 	//登录
@@ -50,13 +53,11 @@ app.controller('SigninFormController', ['$scope', '$http', '$state', 'modelServi
 						$scope.$parent.gegeManager.Name = res.body.Name;
 						//循环判断显示对应权限
 						for(var i = 0; i < res.body.Admpermissionlist.length; i++) {
-							if(res.body.Admpermissionlist[i].PermissionId == '0000000001' || res.body.Admpermissionlist[i].PermissionId == '0000000002') {
+							if(res.body.Admpermissionlist[i].PermissionId == '0000000001') {
 								$scope.$parent.gegePermisson.managerPermisson = true;
 							}
 							if(res.body.Admpermissionlist[i].PermissionId == '0000000009') {
 								$scope.$parent.gegePermisson.nurseLiscencePermisson = true;
-							}
-							if(res.body.Admpermissionlist[i].PermissionId == '0000000010') {
 								$scope.$parent.gegePermisson.nurseCertificatePermisson = true;
 							}
 							if(res.body.Admpermissionlist[i].PermissionId == '0000000005') {
@@ -74,10 +75,12 @@ app.controller('SigninFormController', ['$scope', '$http', '$state', 'modelServi
 							if(res.body.Admpermissionlist[i].PermissionId == '0000000007') {
 								$scope.$parent.gegePermisson.appPermisson = true;
 							}
-							if(res.body.Admpermissionlist[i].PermissionId == '0000000011') {
+							if(res.body.Admpermissionlist[i].PermissionId == '0000000002') {
 								$scope.$parent.gegePermisson.nurseManagePermisson = true;
 							}
 						}
+						$state.go('app.welcome');
+						/*
 						//超级管理员跳转到管理员操作
 						if(res.body.Role == 0) {
 							$state.go('app.manager-operate');
@@ -88,6 +91,7 @@ app.controller('SigninFormController', ['$scope', '$http', '$state', 'modelServi
 							//院内管理员跳转到护士管理
 							$state.go('app.nurse-manage');
 						}
+						*/
 					}
 
 				} else {

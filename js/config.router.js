@@ -167,6 +167,18 @@ angular.module('app')
 							]
 						}
 					})
+					//欢迎页
+					.state('app.welcome', {
+						url: '/welcome',
+						templateUrl: 'tpl/gegeView/app_welcome.html',
+						resolve: {
+							deps: ['$ocLazyLoad',
+								function($ocLazyLoad) {
+									return $ocLazyLoad.load(['js/controllers/gegectrl/welcome.js']);
+								}
+							]
+						}
+					})
 					// others
 					//锁屏
 					.state('lockme', {

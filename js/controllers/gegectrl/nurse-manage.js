@@ -32,23 +32,29 @@ app
 			$state.go('access.signin');
 		}
 		//获取所有医院列表
-		modelService.getHospitalList().then(function(res) {
-			console.log(res);
-			if(res.code == 0) {
-				//处理返回数据
-				$scope.hospitalList = res.body;
+		//		modelService.getHospitalList().then(function(res) {
+		//			console.log(res);
+		//			if(res.code == 0) {
+		//				//处理返回数据
+		//				$scope.hospitalList = res.body;
+		//
+		//			} else {
+		//				alert('数据为空');
+		//			}
+		//		}, function(err) {
+		//			alert('网络出错，请刷新重试！');
+		//		});
 
-			} else {
-				alert('数据为空');
-			}
-		}, function(err) {
-			alert('网络出错，请刷新重试！');
-		});
-
-		//根据分页获取医院列表
+		//根据分页获取护士列表
 		$scope.getNurseInfoList = function(page) {
+			console.log(JSON.stringify({
+				operatorId: $scope.gegeUser.AdmId,
+				hospitalId: $scope.gegeUser.HospitalId,
+				pageNumber: page,
+				pageSize: $scope.pageSize
+			}));
 			modelService.getAllNurseInfo({
-				adminId: $scope.gegeUser.AdmId,
+				operatorId: $scope.gegeUser.AdmId,
 				hospitalId: $scope.gegeUser.HospitalId,
 				pageNumber: page,
 				pageSize: $scope.pageSize
@@ -67,7 +73,7 @@ app
 						$scope.pageList.push(i);
 					}
 				} else {
-					alert('数据为空');
+					alert(res.msg);
 					$scope.pageList = [];
 				}
 			}, function(err) {});

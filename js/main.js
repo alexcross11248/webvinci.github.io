@@ -37,6 +37,10 @@ angular.module('app')
 					container: false
 				}
 			}
+			//禁用右键
+			document.oncontextmenu=function () {
+				return false;
+			}
 
 			$scope.gegePermisson = {
 				'nurseCertificatePermisson': false,
@@ -54,32 +58,30 @@ angular.module('app')
 			$scope.gegeManager = JSON.parse($newLocalStorage.get('gege_manager'));
 			if($scope.gegeManager) {
 				for(var i = 0; i < $scope.gegeManager.Admpermissionlist.length; i++) {
-					if($scope.gegeManager.Admpermissionlist[i].PermissionId == '0000000001' || $scope.gegeManager.Admpermissionlist[i].PermissionId == '0000000002') {
-						$scope.gegePermisson.managerPermisson = true;
+					if($scope.gegeManager.Admpermissionlist[i].PermissionId == '0000000001') {
+						$scope.gegePermisson.managerPermisson = true;  //管理员权限
 					}
 					if($scope.gegeManager.Admpermissionlist[i].PermissionId == '0000000009') {
 						$scope.gegePermisson.nurseLiscencePermisson = true;
-					}
-					if($scope.gegeManager.Admpermissionlist[i].PermissionId == '0000000010') {
 						$scope.gegePermisson.nurseCertificatePermisson = true;
 					}
 					if($scope.gegeManager.Admpermissionlist[i].PermissionId == '0000000005') {
-						$scope.gegePermisson.bannerPermisson = true;
+						$scope.gegePermisson.bannerPermisson = true;  //banner权限
 					}
 					if($scope.gegeManager.Admpermissionlist[i].PermissionId == '0000000003') {
-						$scope.gegePermisson.hospitalManagePermisson = true;
+						$scope.gegePermisson.hospitalManagePermisson = true;  //医院权限
 					}
 					if($scope.gegeManager.Admpermissionlist[i].PermissionId == '0000000004') {
-						$scope.gegePermisson.departmentPermisson = true;
+						$scope.gegePermisson.departmentPermisson = true;  //科室权限
 					}
 					if($scope.gegeManager.Admpermissionlist[i].PermissionId == '0000000006') {
-						$scope.gegePermisson.noticePermisson = true;
+						$scope.gegePermisson.noticePermisson = true;  //公告权限
 					}
 					if($scope.gegeManager.Admpermissionlist[i].PermissionId == '0000000007') {
-						$scope.gegePermisson.appPermisson = true;
+						$scope.gegePermisson.appPermisson = true;   //应用更新权限
 					}
-					if($scope.gegeManager.Admpermissionlist[i].PermissionId == '0000000011') {
-						$scope.gegePermisson.nurseManagePermisson = true;
+					if($scope.gegeManager.Admpermissionlist[i].PermissionId == '0000000002') {
+						$scope.gegePermisson.nurseManagePermisson = true;  //护士管理权限
 					}
 				}
 				console.log($scope.gegePermisson);
@@ -104,6 +106,9 @@ angular.module('app')
 					'managerPermisson': false
 				};
 				$state.go('access.signin');
+			}
+			$scope.changePwd=function () {
+				$state.go('access.changepwd');
 			}
 
 			// save settings to local storage

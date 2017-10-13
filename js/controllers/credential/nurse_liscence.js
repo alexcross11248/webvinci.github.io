@@ -16,17 +16,24 @@ app
 		$scope.showContent=false;
 		console.log('护士资格证');
 		
-		//判断是否有权限
-		if($scope.$parent.gegePermisson.nurseLiscencePermisson) {
-			$scope.showContent=true;
+		$scope.gegeUser = JSON.parse($newLocalStorage.get('gege_manager'));
+		if($scope.gegeUser) {
+			//判断是否有权限
+			if($scope.$parent.gegePermisson.nurseLiscencePermisson) {
+				$scope.showContent = true;
+			} else {
+				alert('您还没有此权限，联系管理员开通吧');
+				return;
+			}
 		} else {
-			alert('您还没有相应权限，联系管理员给您开通吧！');
+			$state.go('access.signin');
 		}
 
 		$scope.getLiscenceList = function(page) {
 			$scope.liscenceList = [];
 			if($scope.searchState == 'all') {
 				var data = {
+					operatorId:$scope.gegeUser.AdmId,
 					pageNumber: page,
 					pageSize: $scope.pageSize,
 					CertificateId: '',
@@ -34,6 +41,7 @@ app
 				};
 			} else {
 				var data = {
+					operatorId:$scope.gegeUser.AdmId,
 					pageNumber: page,
 					pageSize: $scope.pageSize,
 					CertificateId: $scope.searchOption.liscenceID,

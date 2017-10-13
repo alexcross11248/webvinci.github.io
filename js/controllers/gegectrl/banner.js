@@ -5,6 +5,7 @@ app
 	.controller('BannerCtrl', ['$scope', 'commonService', 'modelService', '$newLocalStorage', '$state', function($scope, commonService, modelService, $newLocalStorage, $state) {
 		console.log('banner管理');
 		$scope.showContent = false;
+		$scope.bannerNum = 5;
 		$scope.gegeUser = JSON.parse($newLocalStorage.get('gege_manager'));
 		if($scope.gegeUser) {
 			//判断是否有权限
@@ -19,13 +20,21 @@ app
 		}
 
 		$scope.getBanner = function() {
-			modelService.getBanner().then(function(res) {
+			modelService.getBanner({
+				operatorId: $scope.gegeUser.AdmId
+			}).then(function(res) {
 				console.log(res);
 				if(res.code == 0) {
 					//处理返回数据
 					$scope.bannerList = _.map(commonService.translateServerData(res.body), function(item) {
 						item.bannerImg = modelService.rootUrl + 'Banner/' + item.BannerUrl;
 						item.btnName = '编辑';
+						if(item.IsFlag == 0) {
+							item.showState = '点击开启';
+						} else if(item.IsFlag == 1) {
+							item.showState = '点击关闭';
+						}
+
 						item.btnState = true;
 						return item;
 					});
@@ -36,6 +45,31 @@ app
 			}, function(err) {});
 		}
 		$scope.getBanner();
+
+		$scope.bannerShowOrNot = function(item) {
+			//限制banner至少保留一张
+			for(var i = 0; i < $scope.bannerList.length; i++) {
+				if($scope.bannerList[i].IsDelete == 0) {
+					if($scope.bannerNum == 1) {
+						alert('至少需要保留1张banner');
+						return;
+					} else {
+						$scope.bannerNum--;
+					}
+
+				}
+			}
+
+			if(item.IsDelete == 1) {
+				item.IsDelete = 0;
+				item.showState = '点击开启';
+				$scope.bannerNum--;
+			} else if(item.IsDelete == 0) {
+				item.IsDelete = 1;
+				item.showState = '点击关闭';
+				$scope.bannerNum++;
+			}
+		}
 
 		//显示大图及改变图片
 		$scope.showPic = function(item) {
@@ -130,6 +164,7 @@ app
 					if(res.code == 0) {
 						//处理返回数据
 						alert('更新成功');
+						$scope.getBanner();
 					} else {
 						alert('更新失败');
 					}
