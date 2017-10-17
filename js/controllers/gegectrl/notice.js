@@ -63,7 +63,6 @@ app
 				operatorId: $scope.gegeUser.AdmId,
 				pageNumber: page,
 				pageSize: $scope.pageSize,
-				adminId: $scope.gegeUser.AdmId
 			}).then(function(res) {
 				console.log(res);
 				if(res.code == 0) {
@@ -240,6 +239,9 @@ app
 
 			} else if($scope.operateState == 'edit') {
 				if(file == null || file == '' || file == undefined) {
+					console.log(JSON.stringify({
+						model: $scope.noticeDetail
+					}));
 					modelService.updateNoticeList({
 						model: $scope.noticeDetail
 					}).then(function(result) {

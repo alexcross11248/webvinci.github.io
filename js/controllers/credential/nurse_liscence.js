@@ -13,9 +13,9 @@ app
 		$scope.selectData = false; //是否选中一行
 		$scope.searchOption = {}; //搜索条件
 		$scope.searchState = 'all'; //页面初始显示全部
-		$scope.showContent=false;
+		$scope.showContent = false;
 		console.log('护士资格证');
-		
+
 		$scope.gegeUser = JSON.parse($newLocalStorage.get('gege_manager'));
 		if($scope.gegeUser) {
 			//判断是否有权限
@@ -33,7 +33,7 @@ app
 			$scope.liscenceList = [];
 			if($scope.searchState == 'all') {
 				var data = {
-					operatorId:$scope.gegeUser.AdmId,
+					operatorId: $scope.gegeUser.AdmId,
 					pageNumber: page,
 					pageSize: $scope.pageSize,
 					CertificateId: '',
@@ -41,7 +41,7 @@ app
 				};
 			} else {
 				var data = {
-					operatorId:$scope.gegeUser.AdmId,
+					operatorId: $scope.gegeUser.AdmId,
 					pageNumber: page,
 					pageSize: $scope.pageSize,
 					CertificateId: $scope.searchOption.liscenceID,
@@ -115,14 +115,14 @@ app
 						$scope.selectData = false;
 						$scope.liscenceDetail = {};
 						$scope.getLiscenceList($scope.currentPageNo);
-					}else{
+					} else {
 						alert('数据提交失败！');
 					}
 				}, function(err) {});
 			}
 			if(status == 'deny') {
 				//拒绝通过
-				if ($scope.liscenceDetail.VerifyView==''||$scope.liscenceDetail.VerifyView==undefined) {
+				if($scope.liscenceDetail.VerifyView == '' || $scope.liscenceDetail.VerifyView == undefined) {
 					alert('请输入拒绝的意见');
 					return;
 				}
@@ -172,7 +172,7 @@ app
 			$('tbody tr').removeClass('tr-success');
 			$('tbody tr:eq(' + $index + ')').addClass('tr-success');
 			$scope.selectData = true;
-			$scope.liscenceDetail = item;
+			$scope.liscenceDetail = angular.copy(item);
 		}
 
 		//显示审核框

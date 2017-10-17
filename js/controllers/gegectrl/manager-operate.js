@@ -11,9 +11,7 @@ app
 		$scope.showContent = false; //是否显示内容
 		$scope.disableHospital = true; //禁用医院选择
 		$scope.lockInput = false;
-		$scope.initManagerInfo = {
-
-		};
+		$scope.initManagerInfo = {};
 		$scope.gegeUser = JSON.parse($newLocalStorage.get('gege_manager'));
 		if($scope.gegeUser) {
 			//判断是否有权限

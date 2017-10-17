@@ -136,7 +136,7 @@ app
 		$scope.operateData = function($index, item) {
 			$('tbody tr').removeClass('tr-success');
 			$('tbody tr:eq(' + $index + ')').addClass('tr-success');
-			$scope.hospitalInfoDetail = item;
+			$scope.hospitalInfoDetail = angular.copy(item);
 			$scope.selectData = true;
 		}
 
@@ -181,8 +181,9 @@ app
 
 		//显示审核框
 		$scope.editHospitalInfo = function() {
-			$scope.operateState = 'edit';
 			if($scope.selectData) {
+				$scope.operateState = 'edit';
+				console.log($scope.hospitalInfoDetail);
 				$('#modal_showAudit').modal('show');
 				$scope.initMap();
 			} else {
@@ -235,7 +236,6 @@ app
 		//关闭审核框
 		$scope.closeModal = function() {
 			$('#modal_showAudit').modal('hide');
-			$scope.hospitalInfoDetail = angular.copy($scope.initHospitalInfo);
 		}
 
 		//刷新页面

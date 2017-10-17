@@ -2,7 +2,7 @@
 angular.module('interfaceConfig', []).service('interfaceConfig', function() {
 	var srv = 'http://zh.buzzlysoft.com/UserService.svc/';
 	var rootsrv='http://zh.buzzlysoft.com/';
-	//	var srv='http://zhihu.buzzlysoft.com/UserService.svc/';
+//		var srv='http://zhihu.buzzlysoft.com/UserService.svc/';
 //		var rootsrv='http://zhihu.buzzlysoft.com/';
 	return {
 		BATHURL:rootsrv, //根地址
