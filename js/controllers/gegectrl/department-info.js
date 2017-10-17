@@ -133,6 +133,13 @@ app
 		$scope.goCurrentPage = function(i) {
 			$scope.getAllDepartmentList(i);
 		}
+		
+		//还原状态
+		$scope.initState = function() {
+			$('tbody tr').removeClass('tr-success');
+			$scope.selectData = false;
+		}
+		
 		//选中行
 		$scope.operateData = function($index, item) {
 			console.log($index);
@@ -147,11 +154,9 @@ app
 		$scope.addDepartmentInfo = function() {
 			$scope.operateState = 'add';
 			$scope.showSelectHospital = true; //显示医院选择
-			$('tbody tr').removeClass('tr-success');
-			$scope.selectData = false;
+			$scope.initState();
 			$('#modal_showAudit').modal('show');
 			$scope.departmentInfoDetail = angular.copy($scope.initDepatmentInfo);
-
 		}
 
 		//删除科室
@@ -165,8 +170,7 @@ app
 					modelService.deleteDepatmentInfo(data).then(function(res) {
 						if(res.code == 0) {
 							alert('删除成功');
-							$('tbody tr').removeClass('tr-success');
-							$scope.selectData = false;
+							$scope.initState();
 							$scope.getAllDepartmentList($scope.currentPageNo);
 						} else {
 							alert('删除失败');
@@ -211,6 +215,8 @@ app
 					console.log(res);
 					if(res.code == 0) {
 						alert('添加成功');
+						$scope.initState();
+						$scope.getAllDepartmentList($scope.currentPageNo);
 					} else {
 						alert('添加失败');
 					}
@@ -225,7 +231,8 @@ app
 				}).then(function(res) {
 					if(res.code == 0) {
 						alert('更新成功');
-
+						$scope.initState();
+						$scope.getAllDepartmentList($scope.currentPageNo);
 					} else {
 						alert('更新失败');
 					}
@@ -240,7 +247,6 @@ app
 		//关闭审核框
 		$scope.closeModal = function() {
 			$('#modal_showAudit').modal('hide');
-			$scope.departmentInfoDetail = angular.copy($scope.initDepatmentInfo);
 		}
 
 		//刷新页面

@@ -123,6 +123,12 @@ app
 		$scope.goCurrentPage = function(i) {
 			$scope.getNurseInfoList(i);
 		}
+		
+		//还原状态
+		$scope.initState = function() {
+			$('tbody tr').removeClass('tr-success');
+			$scope.selectData = false;
+		}
 
 		$scope.operateData = function($index, item) {
 			console.log($index);
@@ -139,8 +145,7 @@ app
 		//添加用户
 		$scope.addNurseInfo = function() {
 			$scope.operateState = 'add';
-			$('tbody tr').removeClass('tr-success');
-			$scope.selectData = false;
+			$scope.initState();
 			$scope.lockHospital = false;
 			$scope.depList = [];
 			$('#modal_showAudit').modal('show');
@@ -159,8 +164,7 @@ app
 					modelService.deleteNurse(data).then(function(res) {
 						if(res.code == 0) {
 							alert('删除成功');
-							$('tbody tr').removeClass('tr-success');
-							$scope.selectData = false;
+							$scope.initState();
 							$scope.nurseInfo = angular.copy($scope.initNurseInfo);
 							$scope.getNurseInfoList($scope.currentPageNo);
 						} else {
@@ -202,6 +206,7 @@ app
 					if(res.code == 0) {
 						alert('添加新用户成功！');
 						$scope.nurseInfo = angular.copy($scope.initNurseInfo);
+						$scope.initState();
 						$scope.getNurseInfoList($scope.currentPageNo);
 						$('#modal_showAudit').modal('hide');
 					} else {
@@ -218,8 +223,7 @@ app
 				modelService.updateNurse(data).then(function(res) {
 					if(res.code == 0) {
 						alert('更新成功！');
-						$('tbody tr').removeClass('tr-success');
-						$scope.selectData = false;
+						$scope.initState();
 						$scope.nurseInfo = angular.copy($scope.initNurseInfo);
 						$('#modal_showAudit').modal('hide');
 					} else {

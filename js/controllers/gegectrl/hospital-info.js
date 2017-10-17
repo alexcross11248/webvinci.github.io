@@ -132,6 +132,12 @@ app
 			$scope.currentPageNo = i;
 			$scope.getHospitalInfoList($scope.currentPageNo);
 		}
+		
+		//还原状态
+		$scope.initState = function() {
+			$('tbody tr').removeClass('tr-success');
+			$scope.selectData = false;
+		}
 
 		$scope.operateData = function($index, item) {
 			$('tbody tr').removeClass('tr-success');
@@ -143,8 +149,7 @@ app
 		//添加医院
 		$scope.addHospitalInfo = function() {
 			$scope.operateState = 'add';
-			$('tbody tr').removeClass('tr-success');
-			$scope.selectData = false;
+			$scope.initState();
 			$('#modal_showAudit').modal('show');
 			$scope.hospitalInfoDetail = angular.copy($scope.initHospitalInfo);
 			$scope.initMap();
@@ -163,8 +168,7 @@ app
 					modelService.deleteHospitalInfo(data).then(function(res) {
 						if(res.code == 0) {
 							alert('删除成功');
-							$('tbody tr').removeClass('tr-success');
-							$scope.selectData = false;
+							$scope.initState();
 							$scope.getHospitalInfoList($scope.currentPageNo);
 						} else {
 							alert('删除失败');
@@ -203,6 +207,7 @@ app
 				modelService.addHospitalInfo(data).then(function(res) {
 					if(res.code == 0) {
 						alert('添加成功');
+						$scope.initState();
 						$scope.getHospitalInfoList($scope.currentPageNo);
 					} else {
 						alert('添加失败');
@@ -221,6 +226,8 @@ app
 				modelService.updateHospitalInfo(data).then(function(res) {
 					if(res.code == 0) {
 						alert('更新成功');
+						$scope.initState();
+						$scope.getHospitalInfoList($scope.currentPageNo);
 					} else {
 						alert('更新失败');
 					}

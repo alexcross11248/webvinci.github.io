@@ -68,8 +68,8 @@ app
 				if(res.code == 0) {
 					//处理返回数据
 					$scope.noticeList = _.map(commonService.translateServerData(res.body), function(item) {
-						item.NoticeTime = commonService.str2date(item.NoticeTime, 'yyyy-MM-dd');
-						item.OperatorTime = commonService.str2date(item.OperatorTime, 'yyyy-MM-dd');
+						item.NoticeTimeweb = commonService.str2date(item.NoticeTime, 'yyyy-MM-dd');
+						item.OperatorTimeweb = commonService.str2date(item.OperatorTime, 'yyyy-MM-dd');
 						if(item.Type == 0) {
 							item.noticeType = '平台';
 						} else if(item.Type == 1) {
@@ -118,6 +118,12 @@ app
 			$scope.getNoticeList(i);
 		}
 
+		$scope.initState = function() {
+			$('tbody tr').removeClass('tr-success');
+			$scope.selectData = false;
+			$('#summernote').summernote('code', '');
+		}
+
 		$scope.operateData = function($index, item) {
 			console.log($index);
 			$('tbody tr').removeClass('tr-success');
@@ -129,9 +135,10 @@ app
 		//添加公告
 		$scope.addNotice = function() {
 			$scope.operateState = 'add';
-			$('tbody tr').removeClass('tr-success');
-			$scope.selectData = false;
-			$('#summernote').summernote('code', '');
+			//			$('tbody tr').removeClass('tr-success');
+			//			$scope.selectData = false;
+			//			$('#summernote').summernote('code', '');
+			$scope.initState();
 			$('#modal_showAudit').modal('show');
 			$scope.noticeDetail = angular.copy($scope.initNoticeDetail);
 
@@ -201,6 +208,10 @@ app
 					}).then(function(result) {
 						if(result.code == 0) {
 							alert('添加成功');
+							$scope.initState();
+							$scope.getNoticeList($scope.currentPageNo);
+							$('#modal_showAudit').modal('hide');
+							$scope.noticeDetail = {};
 						} else {
 							alert('添加失败');
 						}
@@ -223,9 +234,14 @@ app
 							}).then(function(result) {
 								if(result.code == 0) {
 									alert('添加成功');
+									$scope.initState();
+									$scope.getNoticeList($scope.currentPageNo);
+									$('#modal_showAudit').modal('hide');
+									$scope.noticeDetail = {};
 								} else {
 									alert('添加失败');
 								}
+
 							}, function(error) {
 								console.log(error);
 								alert('网络故障，请刷新重试!');
@@ -245,10 +261,12 @@ app
 					modelService.updateNoticeList({
 						model: $scope.noticeDetail
 					}).then(function(result) {
-						if(res.code == 0) {
-							alert('添加成功');
+						if(result.code == 0) {
+							alert('更新成功！');
+							$scope.initState();
+							$scope.getNoticeList($scope.currentPageNo);
 						} else {
-							alert('添加失败');
+							alert('更新失败');
 						}
 						$('#modal_showAudit').modal('hide');
 						$scope.noticeDetail = {};
@@ -269,10 +287,12 @@ app
 							modelService.updateNoticeList({
 								model: $scope.noticeDetail
 							}).then(function(result) {
-								if(res.code == 0) {
-									alert('添加成功');
+								if(result.code == 0) {
+									alert('更新成功');
+									$scope.initState();
+									$scope.getNoticeList($scope.currentPageNo);
 								} else {
-									alert('添加失败');
+									alert('更新失败');
 								}
 								$('#modal_showAudit').modal('hide');
 								$scope.noticeDetail = {};

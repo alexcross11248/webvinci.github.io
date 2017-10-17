@@ -123,6 +123,11 @@ app
 		$scope.goCurrentPage = function(i) {
 			$scope.getManagerInfoList(i);
 		}
+		//还原状态
+		$scope.initState = function() {
+			$('tbody tr').removeClass('tr-success');
+			$scope.selectData = false;
+		}
 
 		$scope.operateData = function($index, item) {
 			if(item.AdmId == $scope.gegeUser.AdmId) {
@@ -202,8 +207,7 @@ app
 				$scope.disableHospital = false; //可选医院
 			}
 
-			$('tbody tr').removeClass('tr-success');
-			$scope.selectData = false;
+			$scope.initState();
 			$('#modal_showAudit').modal('show');
 			$scope.managerInfo.Admpermissionlist = [];
 			$scope.managerInfo.Admdepartmentlist = [];
@@ -220,8 +224,7 @@ app
 					}).then(function(res) {
 						if(res.code == 0) {
 							alert('删除成功');
-							$('tbody tr').removeClass('tr-success');
-							$scope.selectData = false;
+							$scope.initState();
 							$scope.getManagerInfoList($scope.currentPageNo);
 						} else {
 							alert('删除失败');
@@ -310,6 +313,7 @@ app
 				modelService.addAdmin(data).then(function(res) {
 					if(res.code == 0) {
 						alert('添加成功');
+						$scope.initState();
 						$scope.getManagerInfoList($scope.currentPageNo);
 					} else {
 						alert('添加失败');
@@ -328,6 +332,7 @@ app
 				modelService.updateAdmin(data).then(function(res) {
 					if(res.code == 0) {
 						alert('更新成功');
+						$scope.initState();
 						$scope.getManagerInfoList($scope.currentPageNo);
 					} else {
 						alert('更新失败');
@@ -354,6 +359,7 @@ app
 						console.log(res);
 						if(res.code == 0) {
 							alert('密码已被重置为：' + res.body.Password + ',请尽快修改！');
+							$scope.initState();
 							$scope.getManagerInfoList($scope.currentPageNo);
 						} else {
 							alert('密码重置失败！');
