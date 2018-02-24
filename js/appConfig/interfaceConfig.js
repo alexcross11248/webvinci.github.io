@@ -1,7 +1,9 @@
 'use strict';
 angular.module('interfaceConfig', []).service('interfaceConfig', function() {
-	var srv = 'http://zh.buzzlysoft.com/UserService.svc/';
-	var rootsrv='http://zh.buzzlysoft.com/';
+	//var srv = 'http://zh.buzzlysoft.com/UserService.svc/';
+	var srv = 'http://36.41.187.107:5558/UserService.svc/';
+	//var rootsrv='http://zh.buzzlysoft.com/';
+	var rootsrv='http://36.41.187.107:5558/';
 //		var srv='http://zhihu.buzzlysoft.com/UserService.svc/';
 //		var rootsrv='http://zhihu.buzzlysoft.com/';
 	return {
